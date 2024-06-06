@@ -32,3 +32,9 @@ export const logout = (data: Response, config?: AxiosRequestConfig) =>
 export const useCurrentUser = (config?: SWRConfiguration<UserResponse>) => {
   return useSWR<UserResponse, AxiosError>(`/auth/me`, config);
 };
+
+export const impersonate = (data: { client_user_id: string }) =>
+  api.post('/auth/impersonate', data);
+
+export const stopImpersonation = () =>
+  api.post('/auth/stop_impersonation');

@@ -6,7 +6,6 @@ from sqlalchemy.orm import relationship
 from data.database import Base
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Text, Enum, func, TIMESTAMP
 
-
 class UserStatus(PyEnum):
     ACTIVE = "ACTIVE"
     PENDING = "PENDING"
@@ -44,6 +43,7 @@ class UserSession(Base):
     end_at = Column(DateTime)
     created_at = Column(TIMESTAMP, nullable=False, server_default=func.current_timestamp())
     updated_at = Column(TIMESTAMP, nullable=False, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
+    impersonator_id = Column(Text, nullable=True)
 
     user = relationship("User")
 

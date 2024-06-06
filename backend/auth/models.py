@@ -15,6 +15,7 @@ class UserResponse(BaseModel):
     status: UserStatus
     created_at: datetime
     updated_at: datetime
+    impersonator_id: Optional[str] = None
 
     model_config = {"from_attributes": True}
 
@@ -32,3 +33,4 @@ class UserInfo(BaseModel):
     picture: Optional[str] = None
     email: str
     hd: Optional[str] = None
+    impersonator_id: Optional[str] = None

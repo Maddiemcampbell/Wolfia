@@ -26,7 +26,6 @@ class UserRequest(BaseModel):
     name: Optional[str]
     organization: Optional[str]
 
-
 def create_or_fetch_user(user_request: UserRequest) -> str:
     with read_write_session() as session:
         user = session.query(User).filter_by(email=user_request.email).first()
@@ -57,7 +56,6 @@ def create_or_fetch_user(user_request: UserRequest) -> str:
             return token
         else:
             return create_new_user_session(session, user_request.email)
-
 
 def create_new_user_session(session: Session, email: str) -> str:
     user = session.query(User).filter_by(email=email).first()
@@ -114,11 +112,11 @@ def authenticate_token(token: str) -> Optional[User]:
 
 
 def get_current_user(request: Request) -> Optional[User]:
+    print("Token received for user authentication:", request.headers)
     jwt_token = request.cookies.get("access_token")
     if jwt_token:
         return authenticate_token(jwt_token)
     return None
-
 
 def decode_jwt(token: str, field: str) -> Optional[str]:
     try:
@@ -139,6 +137,7 @@ def get_jti_from_request(request: Request) -> Optional[str]:
 
 
 def authenticate_user(request: Request) -> User:
+    # print("authenticate_user:", request)
     """
     Returns the user if the token is valid and the user is active, else raises an exception
     """

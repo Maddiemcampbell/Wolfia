@@ -1,9 +1,11 @@
+# jwt_manager.py
+
 import datetime
 import os
 import uuid
 from datetime import timedelta
-
 import jwt
+from typing import Optional
 
 from data.database import read_write_session
 from data.tables import UserSession
@@ -12,13 +14,13 @@ JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
 USER_SESSION_EXPIRY_DURATION_IN_DAYS = 180
 
-
 def create_access_token(user_id: str):
     """
     Create a JWT access token for the given user ID.
 
     Args:
         user_id (str): The user ID for which the token is being created.
+        impersonator_id (Optional[str]): The ID of the impersonator, if any.
 
     Returns:
         str: A JWT token as a string.
@@ -39,14 +41,14 @@ def create_access_token(user_id: str):
     except Exception as e:
         raise TokenCreationError(f"Error creating token for user {user_id}: {e}")
 
-
-def store_user_session(user_id: str, jti: str):
+def store_user_session(user_id: str, jti: str, impersonator_id: Optional[str] = None):
     """
     Store a new user session in the database.
 
     Args:
         user_id (str): The user ID for the session.
         jti (str): The JWT token ID.
+        impersonator_id (Optional[str]): The ID of the impersonator, if any.
 
     Returns:
         str: The ID of the created user session.
@@ -56,6 +58,7 @@ def store_user_session(user_id: str, jti: str):
             id=str(uuid.uuid4()),
             user_id=user_id,
             jti=jti,
+            impersonator_id=impersonator_id,
             created_at=datetime.datetime.now(datetime.UTC),
             expires_at=datetime.datetime.now(datetime.UTC)
             + timedelta(days=USER_SESSION_EXPIRY_DURATION_IN_DAYS),
@@ -63,7 +66,6 @@ def store_user_session(user_id: str, jti: str):
         session.add(user_session)
         session.commit()
         return user_session.id
-
 
 class TokenCreationError(Exception):
     """Raised when there is an issue in creating a JWT token."""

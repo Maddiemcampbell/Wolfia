@@ -98,6 +98,105 @@
         }
       }
     },
+    "/auth/impersonate": {
+      "post": {
+        "summary": "Impersonate",
+        "description": "Start an impersonation session.",
+        "operationId": "impersonate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "client_user_id": {
+                    "type": "integer"
+                  }
+                },
+                "required": ["client_user_id"]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/stop_impersonation": {
+      "post": {
+        "summary": "Stop Impersonation",
+        "description": "Stop the impersonation session and revert to the original user session.",
+        "operationId": "stopImpersonation",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health-check": {
       "get": {
         "summary": "Health Check",
@@ -142,9 +241,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "title": "Response"
       },
       "UserRequest": {
@@ -174,14 +271,21 @@
               }
             ],
             "title": "Organization"
+          },
+          "impersonator_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Impersonator ID"
           }
         },
         "type": "object",
-        "required": [
-          "email",
-          "name",
-          "organization"
-        ],
+        "required": ["email", "name", "organization"],
         "title": "UserRequest"
       },
       "UserResponse": {
@@ -229,6 +333,17 @@
             "type": "string",
             "format": "date-time",
             "title": "Updated At"
+          },
+          "impersonator_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Impersonator ID"
           }
         },
         "type": "object",
@@ -247,11 +362,7 @@
       },
       "UserStatus": {
         "type": "string",
-        "enum": [
-          "ACTIVE",
-          "PENDING",
-          "DEACTIVATED"
-        ],
+        "enum": ["ACTIVE", "PENDING", "DEACTIVATED"],
         "title": "UserStatus"
       },
       "ValidationError": {
@@ -280,11 +391,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
+        "required": ["loc", "msg", "type"],
         "title": "ValidationError"
       }
     }
